@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { setUserUseFinger } from "../store/actions/User";
 import { setLogin } from "../store/actions/Auth";
 
+import { clientMQTT } from "../service/Mqtt";
+
 const Dashboard = ({ navigation }) => {
   const height = Dimensions.get("window").height;
 
@@ -162,6 +164,7 @@ const Application = ({ navigation }) => {
   }, [valueSwitchFinger]);
 
   const onLogout = () => {
+    clientMQTT.disconnect();
     dispatch(setLogin(false));
   };
 
@@ -234,8 +237,12 @@ const Application = ({ navigation }) => {
       </View>
     </View> */}
 
-      <Button buttonColor='#ed1c35' mode="contained" onPress={onLogout} style={{ width: "100%" }}>
-        <TextDefault style={{ color: "white", fontSize: 20, fontWeight: 'bold', paddingVertical: 5 }}>KELUAR</TextDefault>
+      <Button buttonColor="#ed1c35" mode="contained" onPress={onLogout} style={{ width: "100%" }}>
+        <TextDefault
+          style={{ color: "white", fontSize: 20, fontWeight: "bold", paddingVertical: 5 }}
+        >
+          KELUAR
+        </TextDefault>
       </Button>
     </View>
   );
