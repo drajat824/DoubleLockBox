@@ -6,10 +6,14 @@ import ReactNativeBiometrics from "react-native-biometrics";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setLogin } from "./../store/actions/Auth";
+import { setNotificationReceive } from "../store/actions/Notification";
+
+import { ConnectMQTT } from "../service/Mqtt";
 
 const Login = ({ navigation }) => {
   const height = Dimensions.get("window").height;
   const { useFinger, useFace } = useSelector((state) => state?.User);
+  const { idMobile } = useSelector((state) => state?.Mobile) || false;
 
   const rnBiometrics = new ReactNativeBiometrics();
 
@@ -71,9 +75,14 @@ const Login = ({ navigation }) => {
   /**
    * Check PIN
    */
-  onLogin = () => {
+  onLogin = async () => {
     if (pin === pinUser) {
-      dispatch(setLogin(true));
+      ConnectMQTT(idMobile).then((success) => {
+        if (success) {
+          dispatch(setLogin(true));
+          dispatch(setNotificationReceive(true));
+        }
+      });
     } else {
       setErrorMessage(true);
     }
@@ -85,11 +94,16 @@ const Login = ({ navigation }) => {
 
     rnBiometrics
       .simplePrompt({ promptMessage: "Verifikasi Sidik Jari" })
-      .then((resultObject) => {
+      .then(async (resultObject) => {
         const { success } = resultObject;
 
         if (success) {
-          dispatch(setLogin(true));
+          ConnectMQTT(idMobile).then((success) => {
+            if (success) {
+              dispatch(setLogin(true));
+              dispatch(setNotificationReceive(true));
+            }
+          });
         }
       })
       .catch(() => {
@@ -104,8 +118,7 @@ const Login = ({ navigation }) => {
           Selamat Datang!
         </Text>
         <TextDefault>
-          Masukkan Pin keamanan untuk masuk ke aplikasi. Kamu juga dapat masuk dengan FaceID ataupun
-          Biometrik.
+          Masukkan Pin keamanan untuk masuk ke aplikasi. Kamu juga dapat masuk dengan FaceID ataupun Biometrik.
         </TextDefault>
       </View>
 
@@ -127,9 +140,7 @@ const Login = ({ navigation }) => {
             }}
           />
           {errorMessage && <TextError>PIN yang Anda masukkan tidak sama!</TextError>}
-          {errorMessageFinger && (
-            <TextError>Sidik jari tidak sesuai, coba beberapa saat lagi.</TextError>
-          )}
+          {errorMessageFinger && <TextError>Sidik jari tidak sesuai, coba beberapa saat lagi.</TextError>}
         </View>
       </View>
 
@@ -141,12 +152,7 @@ const Login = ({ navigation }) => {
         }}
       >
         <View style={{ flex: 4 }}>
-          <Button
-            disabled={disableButton}
-            mode="contained"
-            onPress={onLogin}
-            style={{ width: "100%", paddingVertical: 5 }}
-          >
+          <Button disabled={disableButton} mode="contained" onPress={onLogin} style={{ width: "100%" }}>
             <TextDefault style={{ color: "white", fontSize: 20 }}>Masuk</TextDefault>
           </Button>
         </View>
@@ -159,18 +165,12 @@ const Login = ({ navigation }) => {
         >
           {useFace && (
             <TouchableOpacity style={{ paddingLeft: 15 }}>
-              <Image
-                style={{ width: 40, resizeMode: "contain" }}
-                source={require("../../assets/smile-2.png")}
-              />
+              <Image style={{ width: 40, resizeMode: "contain" }} source={require("../../assets/smile-2.png")} />
             </TouchableOpacity>
           )}
           {useFinger && !fingerEnrolled ? (
             <TouchableOpacity onPress={onLoginFinger} style={{ paddingLeft: !useFace ? 15 : 0 }}>
-              <Image
-                style={{ width: 40, resizeMode: "contain" }}
-                source={require("../../assets/finger.png")}
-              />
+              <Image style={{ width: 40, resizeMode: "contain" }} source={require("../../assets/finger.png")} />
             </TouchableOpacity>
           ) : null}
         </View>

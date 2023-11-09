@@ -9,6 +9,7 @@ import Notification from './Notification'
 import AddDevice from './AddDevice'
 import RegisterFingerFailed from './RegisterFingerFailed'
 import RegisterFingerSuccess from './RegisterFingerSuccess'
+import DeviceFingerprint from './DeviceFingerprint'
 
 export {
     RegisterFinger,
@@ -21,5 +22,6 @@ export {
     Notification,
     AddDevice,
     RegisterFingerFailed,
-    RegisterFingerSuccess
+    RegisterFingerSuccess,
+    DeviceFingerprint
 }

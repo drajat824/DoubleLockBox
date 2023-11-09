@@ -3,11 +3,14 @@ import { Text } from "react-native-paper";
 import { StyleSheet } from "react-native";
 
 const TextError = ({ style, children, ...props }) => (
-  <Text variant="bodyLarge" style={{color: 'red', fontWeight: 'bold'}} >{children}</Text>
+  <Text variant="bodyLarge" style={[style, styles.text]} >{children}</Text>
 );
 
 const styles = StyleSheet.create({
-  color: 'red'
+  text : {
+    color: 'red',
+    fontWeight: 'bold'
+  }
 })
 
 export default memo(TextError);

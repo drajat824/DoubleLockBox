@@ -1,111 +1,260 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Dimensions, StyleSheet, TouchableOpacity, Image, Switch } from "react-native";
-import { Button, Text } from "react-native-paper";
-import { ScrollContainer, TextDefault, InputPin, Container } from "../component";
+import { ScrollContainer } from "../component";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import { Button, Text } from "react-native-paper";
+import { clientMQTT } from "../service/Mqtt";
+import { useSelector } from "react-redux";
 
-const DeviceDetail = ({ navigation }) => {
+const DeviceDetail = ({ navigation, route }) => {
   const height = Dimensions.get("window").height;
+  const { device } = route.params;
+  const { idMobile } = useSelector((state) => state?.Mobile) || false;
+
+  const [dataDevice, setDataDevice] = useState({
+    finger: true,
+    gembok: true,
+    vibrate: true,
+    notification: true,
+  });
+
+  const CloseGembok = () => {
+    if (clientMQTT.isConnected()) {
+      const data = JsonToString({ command: "/tutup-gembok", id_mobile: idMobile });
+      clientMQTT.publish("request-mobile", data);
+    }
+  };
+
+  const OnRegisterFinger = () => {
+    navigation.navigate("DeviceFingerprintScreen", { device });
+  };
+
+  const OffBuzzer = () => {
+    if (clientMQTT.isConnected()) {
+      const data = JsonToString({ command: "/matikan-buzzer", id_mobile: idMobile });
+      clientMQTT.publish("request-mobile", data);
+    }
+  };
+
+  const ChangeFinger = (e) => {
+    if (clientMQTT.isConnected()) {
+      if (dataDevice.finger == true) {
+        const data = JsonToString({ command: "/matikan-finger", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      } else {
+        const data = JsonToString({ command: "/hidupkan-finger", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      }
+    }
+  };
+
+  const ChangeVibrate = (e) => {
+    if (clientMQTT.isConnected()) {
+      if (dataDevice.vibrate == true) {
+        const data = JsonToString({ command: "/matikan-getar", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      } else {
+        const data = JsonToString({ command: "/hidupkan-getar", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      }
+    }
+  };
+
+  const ChangeNotification = (e) => {
+    if (clientMQTT.isConnected()) {
+      if (dataDevice.notification == true) {
+        const data = JsonToString({ command: "/matikan-notifikasi", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      } else {
+        const data = JsonToString({ command: "/hidupkan-notifikasi", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      }
+    }
+  };
+
+  const JsonToString = (str) => {
+    return JSON.stringify(str);
+  };
+
+  useEffect(() => {
+    if (clientMQTT.isConnected()) {
+      const data = JsonToString({ command: "/status", id_mobile: idMobile });
+      clientMQTT.publish("request-mobile", data);
+    }
+  }, []);
+
+  if (clientMQTT.isConnected()) {
+    clientMQTT.onMessageArrived = (message) => {
+      var jsonString = message.payloadString;
+      var jsonObject = JSON.parse(jsonString);
+
+      console.log(jsonObject);
+
+      if (jsonObject?.type == "device-status") {
+        setDataDevice({
+          finger: jsonObject?.finger,
+          gembok: jsonObject?.gembok,
+          vibrate: jsonObject?.vibrate,
+          notification: jsonObject?.notification,
+        });
+      }
+    };
+  }
 
   return (
-    <Container contentContainerStyle={{ paddingTop: 20 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <TouchableOpacity onPress={() => navigation.navigate("DashboardScreen")} >
+    <ScrollContainer contentContainerStyle={{ paddingTop: 20 }}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.navigate("DashboardScreen")}>
           <Icon name="chevron-left" size={30} />
         </TouchableOpacity>
-        <Text style={{ fontWeight: "bold", paddingBottom: 10 }} variant="headlineSmall">
+        <Text variant="headlineSmall" style={styles.headerTitle}>
           Perangkat
         </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("NotificationScreen")} >
+        <TouchableOpacity onPress={() => navigation.navigate("NotificationScreen", { device })}>
           <Icon name="bell" size={30} />
         </TouchableOpacity>
       </View>
 
       <View style={{ height: height, paddingTop: 30 }}>
         <View style={styles.card}>
-          <Image style={{ alignSelf: "center" }} source={require("../../assets/perangkat.png")} />
-          <View style={{ paddingLeft: 10, flexDirection: "column" }}>
-            <Text style={{ fontWeight: "bold" }} variant="headlineSmall">
-              ID Perangkat
-            </Text>
-            <TextDefault>718297398127</TextDefault>
-            <Text style={{ position: "absolute", bottom: 5, left: 10 }}>Active</Text>
-          </View>
-        </View>
-
-        <View style={{ flex: 2 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <View style={[styles.card, { width: "48%", height: 160, flexDirection: "column" }]}>
-              <View>
-                <Image source={require("../../assets/smile.png")} />
-                <Text style={{ fontWeight: "bold", paddingBottom: 10, fontSize: 20, paddingTop: 10, paddingLeft: 3 }} variant="labelLarge">
-                  Face ID
+          <View style={{ flexDirection: "row" }}>
+            <Image style={styles.cardImage} source={require("../../assets/perangkat.png")} />
+            <View style={styles.cardContent}>
+              <Text variant="headlineSmall" style={styles.cardTitle}>
+                ID Perangkat
+              </Text>
+              <View style={{ position: "absolute", bottom: 5, left: 10 }}>
+                <Text variant="labelLarge" style={styles.cardText}>
+                  {device?.id_device}
                 </Text>
-                <View style={{ justifyContent: "flex-start" }}>
-                  <Switch value={true} thumbColor="#414EBD" color="#414EBD" />
-                </View>
-              </View>
-            </View>
-
-            <View style={[styles.card, { width: "48%", height: 160, flexDirection: "column" }]}>
-              <View>
-                <Image source={require("../../assets/finger-2.png")} />
-                <Text style={{ fontWeight: "bold", paddingBottom: 10, fontSize: 20, paddingTop: 10, paddingLeft: 3 }} variant="labelLarge">
-                  Fingerprint
+                <Text variant="labelLarge" style={styles.cardStatus}>
+                  {dataDevice?.gembok ? "Tertutup" : "Terbuka"}
                 </Text>
-                <View style={{ justifyContent: "flex-start" }}>
-                  <Switch value={true} thumbColor="#414EBD" color="#414EBD" />
-                </View>
               </View>
             </View>
           </View>
 
           <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <View style={[styles.card, { width: "48%", height: 160, flexDirection: "column" }]}>
-              <View>
-                <Image source={require("../../assets/vibrate.png")} />
-                <Text style={{ fontWeight: "bold", paddingBottom: 10, fontSize: 20, paddingTop: 10, paddingLeft: 3 }} variant="labelLarge">
-                  Face ID
-                </Text>
-                <View style={{ justifyContent: "flex-start" }}>
-                  <Switch value={true} thumbColor="#414EBD" color="#414EBD" />
-                </View>
-              </View>
-            </View>
+            <Button
+              onPress={OffBuzzer}
+              mode="contained"
+              style={{ marginTop: 15, borderRadius: 5, marginRight: 5, backgroundColor: "#FFB90B" }}
+            >
+              MATIKAN BUNYI
+            </Button>
 
-            <View style={[styles.card, { width: "48%", height: 160, flexDirection: "column" }]}>
-              <View>
-                <Image source={require("../../assets/bell.png")} />
-                <Text style={{ fontWeight: "bold", paddingBottom: 10, fontSize: 20, paddingTop: 10, paddingLeft: 3 }} variant="labelLarge">
-                  Fingerprint
-                </Text>
-                <View style={{ justifyContent: "flex-start" }}>
-                  <Switch value={true} thumbColor="#414EBD" color="#414EBD" />
-                </View>
-              </View>
-            </View>
+            <Button
+              onPress={CloseGembok}
+              mode="contained"
+              style={{ marginTop: 15, borderRadius: 5, flex: 1, backgroundColor: "#D30808" }}
+            >
+              TUTUP KUNCI
+            </Button>
           </View>
         </View>
 
-        <View style={{ flex: 1.1, justifyContent: "flex-start" }}>
-          <TouchableOpacity style={{alignItems: 'center'}} >
-            <Image style={{ width: 70, resizeMode: "contain" }} source={require("../../assets/unlock.png")} />
+        <View style={[styles.switchContainer, { paddingBottom: 15 }]}>
+          {renderSwitch("Face ID", require("../../assets/smile.png"), false, null)}
+          {renderSwitch("Fingerprint", require("../../assets/finger-2.png"), dataDevice?.finger, ChangeFinger, OnRegisterFinger)}
+        </View>
+        <View style={styles.switchContainer}>
+          {renderSwitch("Vibration", require("../../assets/vibrate.png"), dataDevice?.vibrate, ChangeVibrate)}
+          {renderSwitch("Notifikasi", require("../../assets/bell.png"), dataDevice?.notification, ChangeNotification)}
+        </View>
+
+        <View style={styles.unlockContainer}>
+          <TouchableOpacity style={styles.unlockButton}>
+            <Image style={styles.unlockImage} source={require("../../assets/unlock.png")} />
           </TouchableOpacity>
         </View>
       </View>
-    </Container>
+    </ScrollContainer>
   );
 };
 
-export default DeviceDetail;
+const IconKey = ({ OnRegisterFinger }) => (
+  <TouchableOpacity style={{ position: "absolute", left: 15, bottom: 10 }} onPress={OnRegisterFinger}>
+    <Icon name="key" color="#E79E08" size={30} />
+  </TouchableOpacity>
+);
+
+const renderSwitch = (label, imageSource, value, onValueChange, OnRegisterFinger) => (
+  <View style={styles.switchCard}>
+    {imageSource && <Image style={{ width: 60, resizeMode: "contain" }} source={imageSource} />}
+    <Text style={styles.cardTitle} variant="titleLarge">
+      {label}
+    </Text>
+    {OnRegisterFinger && <IconKey OnRegisterFinger={OnRegisterFinger} />}
+    <Switch
+      style={{ position: "absolute", right: 10, bottom: 10 }}
+      value={value}
+      onValueChange={onValueChange}
+      thumbColor="#414EBD"
+      color="#414EBD"
+    />
+  </View>
+);
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontWeight: "bold",
+    paddingBottom: 10,
+  },
   card: {
     borderRadius: 10,
     backgroundColor: "white",
-    paddingVertical: 15,
     padding: 15,
-    flexDirection: "row",
     marginBottom: 15,
   },
+  cardImage: {
+    alignSelf: "center",
+  },
+  cardContent: {
+    paddingLeft: 10,
+    flexDirection: "column",
+  },
+  cardTitle: {
+    fontWeight: "bold",
+    paddingTop: 5,
+  },
+  cardText: {
+    bottom: 5,
+  },
+  cardStatus: {
+    bottom: 5,
+    color: "grey",
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  switchCard: {
+    width: "48%",
+    height: 180,
+    flexDirection: "column",
+    borderRadius: 10,
+    backgroundColor: "white",
+    padding: 15,
+  },
+  switchView: {
+    flexDirection: "row",
+  },
+  unlockContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
+  },
+  unlockButton: {
+    alignItems: "center",
+  },
+  unlockImage: {
+    width: 70,
+    resizeMode: "contain",
+  },
 });
+
+export default DeviceDetail;
