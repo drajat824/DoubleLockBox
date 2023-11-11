@@ -14,6 +14,8 @@ import {
   RegisterFingerSuccess,
   RegisterFingerFailed,
   DeviceFingerprint,
+  DeviceCamera,
+  DeviceMaps
 } from "../screens";
 import { useSelector, useDispatch } from "react-redux";
 import { setNotifications, setNotificationReceive } from "../store/actions/Notification";
@@ -50,32 +52,20 @@ const Routes = () => {
   }, []);
 
   if (!!notificationEnabled) {
-
-    // OneSignal.Notifications.addEventListener("click", (event) => {
-    //   const notificationData = event.notification;
-    //   console.log("CLICK. Data Notifikasi:", notificationData?.body);
-    //   const navigation = useNavigation();
-    //   navigation.navigate("NotificationScreen");
-    // });
     OneSignal.Notifications.addEventListener("foregroundWillDisplay", (event) => {
       event.preventDefault();
       const notificationData = event.notification;
-      dispatch(setNotifications(notificationData?.body))
+      dispatch(setNotifications(notificationData?.body));
       event.getNotification().display();
     });
-    // OneSignal.Notifications.addEventListener("received", (event) => {
-    //   console.log('Received Notification: ', notification);
-    // });
   }
 
-  // useEffect(() => {
   if (!!notificationEnabled) {
     OneSignal.Notifications.hasPermission();
     OneSignal.User.pushSubscription.optIn();
   } else {
     OneSignal.User.pushSubscription.optOut();
   }
-  // }, [notificationEnabled]);
 
   clientMQTT.onConnectionLost = async function (responseObject) {
     if (responseObject.errorCode !== 0) {
@@ -189,6 +179,8 @@ const Routes = () => {
           component={DeviceFingerprint}
           options={{ headerTitle: "", headerTransparent: true }}
         />
+        <Stack.Screen name="DeviceCameraScreen" component={DeviceCamera} options={{ headerTitle: "", headerTransparent: true }} />
+        <Stack.Screen name="DeviceMapsScreen" component={DeviceMaps} options={{ headerTitle: "", headerTransparent: true }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

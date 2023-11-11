@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Dimensions, StyleSheet, TouchableOpacity, Image, Switch } from "react-native";
-import { ScrollContainer } from "../component";
+import { ScrollContainer, TextDefault } from "../component";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { Button, Text } from "react-native-paper";
 import { clientMQTT } from "../service/Mqtt";
@@ -16,6 +16,7 @@ const DeviceDetail = ({ navigation, route }) => {
     gembok: true,
     vibrate: true,
     notification: true,
+    camera: true,
   });
 
   const CloseGembok = () => {
@@ -27,6 +28,10 @@ const DeviceDetail = ({ navigation, route }) => {
 
   const OnRegisterFinger = () => {
     navigation.navigate("DeviceFingerprintScreen", { device });
+  };
+
+  const OnRegisterCamera = () => {
+    navigation.navigate("DeviceCameraScreen", { device });
   };
 
   const OffBuzzer = () => {
@@ -43,6 +48,18 @@ const DeviceDetail = ({ navigation, route }) => {
         clientMQTT.publish("request-mobile", data);
       } else {
         const data = JsonToString({ command: "/hidupkan-finger", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      }
+    }
+  };
+
+  const ChangeCamera = (e) => {
+    if (clientMQTT.isConnected()) {
+      if (dataDevice.camera == true) {
+        const data = JsonToString({ command: "/matikan-kamera", id_mobile: idMobile });
+        clientMQTT.publish("request-mobile", data);
+      } else {
+        const data = JsonToString({ command: "/hidupkan-kamera", id_mobile: idMobile });
         clientMQTT.publish("request-mobile", data);
       }
     }
@@ -96,6 +113,7 @@ const DeviceDetail = ({ navigation, route }) => {
           gembok: jsonObject?.gembok,
           vibrate: jsonObject?.vibrate,
           notification: jsonObject?.notification,
+          camera: jsonObject?.camera,
         });
       }
     };
@@ -151,10 +169,18 @@ const DeviceDetail = ({ navigation, route }) => {
               TUTUP KUNCI
             </Button>
           </View>
+
+          <TouchableOpacity
+            style={{ paddingTop: 10, flexDirection: "row" }}
+            onPress={() => navigation.navigate("DeviceMapsScreen", { device })}
+          >
+            <Icon name="map-marker" color="#FF5252" size={20} style={{ paddingRight: 5, paddingTop: 0 }} />
+            <TextDefault style={{ textDecorationLine: "underline", color: "#FF5252" }}>Lihat Lokasi Perangkat</TextDefault>
+          </TouchableOpacity>
         </View>
 
         <View style={[styles.switchContainer, { paddingBottom: 15 }]}>
-          {renderSwitch("Face ID", require("../../assets/smile.png"), false, null)}
+          {renderSwitch("Face ID", require("../../assets/smile.png"), dataDevice?.camera, ChangeCamera, OnRegisterCamera)}
           {renderSwitch("Fingerprint", require("../../assets/finger-2.png"), dataDevice?.finger, ChangeFinger, OnRegisterFinger)}
         </View>
         <View style={styles.switchContainer}>
@@ -172,19 +198,19 @@ const DeviceDetail = ({ navigation, route }) => {
   );
 };
 
-const IconKey = ({ OnRegisterFinger }) => (
-  <TouchableOpacity style={{ position: "absolute", left: 15, bottom: 10 }} onPress={OnRegisterFinger}>
+const IconKey = ({ OnRegister }) => (
+  <TouchableOpacity style={{ position: "absolute", left: 15, bottom: 10 }} onPress={OnRegister}>
     <Icon name="key" color="#E79E08" size={30} />
   </TouchableOpacity>
 );
 
-const renderSwitch = (label, imageSource, value, onValueChange, OnRegisterFinger) => (
+const renderSwitch = (label, imageSource, value, onValueChange, OnRegister) => (
   <View style={styles.switchCard}>
     {imageSource && <Image style={{ width: 60, resizeMode: "contain" }} source={imageSource} />}
     <Text style={styles.cardTitle} variant="titleLarge">
       {label}
     </Text>
-    {OnRegisterFinger && <IconKey OnRegisterFinger={OnRegisterFinger} />}
+    {OnRegister && <IconKey OnRegister={OnRegister} />}
     <Switch
       style={{ position: "absolute", right: 10, bottom: 10 }}
       value={value}

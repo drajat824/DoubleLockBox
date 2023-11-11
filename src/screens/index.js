@@ -10,6 +10,8 @@ import AddDevice from './AddDevice'
 import RegisterFingerFailed from './RegisterFingerFailed'
 import RegisterFingerSuccess from './RegisterFingerSuccess'
 import DeviceFingerprint from './DeviceFingerprint'
+import DeviceCamera from './DeviceCamera'
+import DeviceMaps from './DeviceMaps'
 
 export {
     RegisterFinger,
@@ -23,5 +25,7 @@ export {
     AddDevice,
     RegisterFingerFailed,
     RegisterFingerSuccess,
-    DeviceFingerprint
+    DeviceFingerprint,
+    DeviceCamera,
+    DeviceMaps
 }

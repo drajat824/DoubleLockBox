@@ -11,7 +11,8 @@ import { DisconnectMQTT, clientMQTT } from "../service/Mqtt";
 const Dashboard = ({ navigation }) => {
   const height = Dimensions.get("window").height;
   const [activeScreen, setActiveScreen] = useState("Perangkat");
-  const { devices } = useSelector((state) => state?.Devices) || [{}];
+  // const { devices } = useSelector((state) => state?.Devices) || [{}];
+  const devices = [{id_device: "asdasdasdas", pin_device: 123123}]
 
   return (
     <ScrollContainer
@@ -115,10 +116,16 @@ const DeviceListView = ({ devices, onDeviceClick }) => (
 const Application = ({ navigation }) => {
   const dispatch = useDispatch();
   const { useFinger } = useSelector((state) => state?.User);
+
   const [valueSwitchFinger, setValueSwitchFinger] = useState(useFinger);
+  const [valueSwitchFace, setValueSwitchFace] = useState(useFinger);
 
   const onChangeSwitchFinger = () => {
     setValueSwitchFinger(!valueSwitchFinger);
+  };
+
+  const onChangeSwitchFace = () => {
+    setValueSwitchFace(!valueSwitchFace);
   };
 
   useEffect(() => {
@@ -135,6 +142,7 @@ const Application = ({ navigation }) => {
     <View>
       <PinSettings navigation={navigation} />
       <BiometricSettings valueSwitchFinger={valueSwitchFinger} onChangeSwitchFinger={onChangeSwitchFinger} />
+      <FacecSettings valueSwitchFinger={valueSwitchFace} onChangeSwitchFinger={onChangeSwitchFace} />
       <LogoutButton onLogout={onLogout} />
     </View>
   );
@@ -156,10 +164,22 @@ const PinSettings = ({ navigation }) => (
 
 const BiometricSettings = ({ valueSwitchFinger, onChangeSwitchFinger }) => (
   <View style={styles.settingsView}>
-    <Image style={styles.centeredImage} source={require("../../assets/pin.png")} />
+    <Image style={styles.centeredImage} source={require("../../assets/finger-2.png")} />
     <View style={{ paddingLeft: 10, flex: 1, flexDirection: "column" }}>
       <Text style={styles.boldText} variant="headlineSmall">
         Biometrik
+      </Text>
+      <Switch onChange={onChangeSwitchFinger} value={valueSwitchFinger} thumbColor="#414EBD" color="#414EBD" />
+    </View>
+  </View>
+);
+
+const FacecSettings = ({ valueSwitchFinger, onChangeSwitchFinger }) => (
+  <View style={styles.settingsView}>
+    <Image style={styles.centeredImage} source={require("../../assets/smile.png")} />
+    <View style={{ paddingLeft: 10, flex: 1, flexDirection: "column" }}>
+      <Text style={styles.boldText} variant="headlineSmall">
+        Face ID
       </Text>
       <Switch onChange={onChangeSwitchFinger} value={valueSwitchFinger} thumbColor="#414EBD" color="#414EBD" />
     </View>

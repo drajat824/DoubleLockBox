@@ -12,6 +12,7 @@
     "@react-native-async-storage/async-storage": "^1.19.3",
     "@react-navigation/native": "^6.1.8",
     "@react-navigation/stack": "^6.3.18",
+    "@rnmapbox/maps": "^10.0.15",
     "axios": "^1.5.1",
     "expo": "~49.0.13",
     "expo-local-authentication": "^13.6.0",
