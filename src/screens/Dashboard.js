@@ -7,12 +7,13 @@ import { setUserUseFinger } from "../store/actions/User";
 import { setLogin } from "../store/actions/Auth";
 import { setNotificationReceive } from "../store/actions/Notification";
 import { DisconnectMQTT, clientMQTT } from "../service/Mqtt";
+import { OneSignal } from "react-native-onesignal";
 
 const Dashboard = ({ navigation }) => {
   const height = Dimensions.get("window").height;
   const [activeScreen, setActiveScreen] = useState("Perangkat");
-  // const { devices } = useSelector((state) => state?.Devices) || [{}];
-  const devices = [{id_device: "asdasdasdas", pin_device: 123123}]
+  const { devices } = useSelector((state) => state?.Devices) || [{}];
+  // const { devices } = [{id_device: 'qasdklskd', pin_device: 'adlm'}]
 
   return (
     <ScrollContainer
@@ -134,6 +135,7 @@ const Application = ({ navigation }) => {
 
   const onLogout = async () => {
     await DisconnectMQTT();
+    await OneSignal.User.pushSubscription.optOut();
     dispatch(setLogin(false));
     dispatch(setNotificationReceive(false));
   };
@@ -181,7 +183,7 @@ const FacecSettings = ({ valueSwitchFinger, onChangeSwitchFinger }) => (
       <Text style={styles.boldText} variant="headlineSmall">
         Face ID
       </Text>
-      <Switch onChange={onChangeSwitchFinger} value={valueSwitchFinger} thumbColor="#414EBD" color="#414EBD" />
+      <Switch onChange={onChangeSwitchFinger} value={false} thumbColor="#414EBD" color="#414EBD" />
     </View>
   </View>
 );

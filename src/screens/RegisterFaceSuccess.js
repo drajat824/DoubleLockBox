@@ -6,7 +6,7 @@ import { Container, TextDefault } from "../component";
 import { useDispatch } from "react-redux";
 import { setRegister } from "../store/actions/Register";
 
-const RegisterFace = ({ navigation }) => {
+const RegisterFaceSuccess = ({ navigation }) => {
   const dispatch = useDispatch();
 
   return (
@@ -20,7 +20,7 @@ const RegisterFace = ({ navigation }) => {
       <View style={{ flex: 4 }}>
         <Image source={require("../../assets/face-activation.png")} />
         <Switch
-          value={true}
+          value={false}
           thumbColor="#414EBD"
           color="#414EBD"
           style={{
@@ -52,4 +52,4 @@ const RegisterFace = ({ navigation }) => {
   );
 };
 
-export default RegisterFace;
+export default RegisterFaceSuccess;

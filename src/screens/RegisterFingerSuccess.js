@@ -50,11 +50,12 @@ const RegisterFingerSuccess = ({ navigation }) => {
         <Button
           onPress={() => {
             dispatch(setUserUseFinger(true));
-            dispatch(setRegister(true));
+            navigation.navigate("RegisterFaceScreen")
           }}
           mode="contained"
           style={{ width: 150 }}
         >
+          
           <TextDefault style={{ color: "white" }}>Lanjut</TextDefault>
         </Button>
       </View>

@@ -83,7 +83,7 @@ const RegisterFinger = ({ navigation }) => {
           justifyContent: "space-between",
         }}
       >
-        <Button onPress={() => dispatch(setRegister(true))}>
+        <Button onPress={() => navigation.navigate("RegisterFaceScreen")}>
           <TextDefault>LEWATI</TextDefault>
         </Button>
         <Button onPress={onNext} mode="contained" style={{ width: 150 }}>

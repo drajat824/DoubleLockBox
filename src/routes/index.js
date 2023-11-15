@@ -15,7 +15,9 @@ import {
   RegisterFingerFailed,
   DeviceFingerprint,
   DeviceCamera,
-  DeviceMaps
+  DeviceMaps,
+  RegisterFaceCamera,
+  RegisterFaceSuccess,
 } from "../screens";
 import { useSelector, useDispatch } from "react-redux";
 import { setNotifications, setNotificationReceive } from "../store/actions/Notification";
@@ -63,8 +65,6 @@ const Routes = () => {
   if (!!notificationEnabled) {
     OneSignal.Notifications.hasPermission();
     OneSignal.User.pushSubscription.optIn();
-  } else {
-    OneSignal.User.pushSubscription.optOut();
   }
 
   clientMQTT.onConnectionLost = async function (responseObject) {
@@ -129,6 +129,18 @@ const Routes = () => {
           <Stack.Screen
             name="RegisterFaceScreen"
             component={RegisterFace}
+            options={{ headerTitle: "", headerTransparent: true }}
+          />
+
+          <Stack.Screen
+            name="RegisterFaceCameraScreen"
+            component={RegisterFaceCamera}
+            options={{ headerTitle: "", headerTransparent: true }}
+          />
+
+          <Stack.Screen
+            name="RegisterFaceSuccessScreen"
+            component={RegisterFaceSuccess}
             options={{ headerTitle: "", headerTransparent: true }}
           />
         </Stack.Navigator>

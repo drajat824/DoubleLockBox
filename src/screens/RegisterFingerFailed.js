@@ -66,7 +66,7 @@ const RegisterFingerFailed = ({ navigation }) => {
           justifyContent: "space-between",
         }}
       >
-        <Button onPress={() => dispatch(setRegister(true))}>
+        <Button onPress={() => navigation.navigate("RegisterFaceScreen")}>
           <TextDefault>LEWATI</TextDefault>
         </Button>
       </View>

@@ -9,15 +9,14 @@ Mapbox.setAccessToken("pk.eyJ1IjoiZHJhamF0ODI0IiwiYSI6ImNsb3N3ajRhcTA0aTcybHMxbm
 
 const DeviceMaps = ({navigation, route}) => {
   const { device } = route.params;
-  const url = `https://www.google.com/maps/search/?api=1&query=${-7.768874467934427},${110.3881150818665}`;
+  const url = `https://www.google.com/maps/search/?api=1&query=${-8.168423652099786},${113.71678847182412}`;
 
   return (
     <View style={{ flex: 1 }}>
       <MapView id="tes" style={{ flex: 1 }}>
-        <Camera zoomLevel={18} centerCoordinate={[110.3881150818665, -7.768874467934427]} />
-        <PointAnnotation id="tes" coordinate={[110.3881150818665, -7.768874467934427]} />
+        <Camera zoomLevel={18} centerCoordinate={[113.71678847182412, -8.168423652099786]} />
+        <PointAnnotation id="tes" coordinate={[113.71678847182412, -8.168423652099786]} />
       </MapView>
-
       <View
         style={{
           alignSelf: "center",
