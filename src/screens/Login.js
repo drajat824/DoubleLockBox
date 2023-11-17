@@ -80,7 +80,7 @@ const Login = ({ navigation }) => {
       ConnectMQTT(idMobile).then((success) => {
         if (success) {
           dispatch(setLogin(true));
-          dispatch(setNotificationReceive(true));
+          // dispatch(setNotificationReceive(true));
         }
       });
     } else {
@@ -101,7 +101,7 @@ const Login = ({ navigation }) => {
           ConnectMQTT(idMobile).then((success) => {
             if (success) {
               dispatch(setLogin(true));
-              dispatch(setNotificationReceive(true));
+              // dispatch(setNotificationReceive(true));
             }
           });
         }

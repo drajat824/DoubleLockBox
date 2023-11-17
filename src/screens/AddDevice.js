@@ -23,11 +23,13 @@ const AddDevice = ({ navigation }) => {
   };
 
   const handleSaveDevice = () => {
-    setErrorMessage("");
-    const data = JsonToString({ command: "authentication", id_perangkat: id, pin_perangkat: pin, id_mobile: idMobile });
-    if (clientMQTT.isConnected()) {
-      clientMQTT.publish("request-mobile", data);
-    }
+    const newDevice = { id_device: '12321321321', pin_device: 123123213 };
+    dispatch(addDevice(newDevice));
+    // setErrorMessage("");
+    // const data = JsonToString({ command: "authentication", id_perangkat: id, pin_perangkat: pin, id_mobile: idMobile });
+    // if (clientMQTT.isConnected()) {
+    //   clientMQTT.publish("request-mobile", data);
+    // }
   };
 
   if (clientMQTT.isConnected()) {

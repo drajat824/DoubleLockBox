@@ -135,9 +135,9 @@ const Application = ({ navigation }) => {
 
   const onLogout = async () => {
     await DisconnectMQTT();
-    await OneSignal.User.pushSubscription.optOut();
+    // await OneSignal.User.pushSubscription.optOut();
     dispatch(setLogin(false));
-    dispatch(setNotificationReceive(false));
+    // dispatch(setNotificationReceive(false));
   };
 
   return (

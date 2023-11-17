@@ -47,25 +47,26 @@ const Routes = () => {
   const { notificationEnabled } = useSelector((state) => state?.Notification) || false;
   const { idMobile } = useSelector((state) => state?.Mobile) || false;
 
+  const { devices } = useSelector((state) => state?.Devices) || [];
+
   const [connectionLost, setConnectionLost] = useState(false);
 
   useEffect(() => {
-    OneSignal.initialize("49b0050a-99f4-4842-ba5b-db1b516fb6cb");
-  }, []);
-
-  if (!!notificationEnabled) {
     OneSignal.Notifications.addEventListener("foregroundWillDisplay", (event) => {
       event.preventDefault();
       const notificationData = event.notification;
       dispatch(setNotifications(notificationData?.body));
       event.getNotification().display();
     });
-  }
+  }, []);
 
-  if (!!notificationEnabled) {
-    OneSignal.Notifications.hasPermission();
-    OneSignal.User.pushSubscription.optIn();
-  }
+  useEffect(() => {
+    if (devices?.length > 0) {
+      OneSignal.User.addTag("double-lock-box", "true");
+    } else {
+      OneSignal.User.removeTag("double-lock-box");
+    }
+  }, [devices]);
 
   clientMQTT.onConnectionLost = async function (responseObject) {
     if (responseObject.errorCode !== 0) {
