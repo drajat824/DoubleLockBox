@@ -12,7 +12,7 @@ const AddDevice = ({ navigation }) => {
 
   const { idMobile } = useSelector((state) => state?.Mobile) || false;
 
-  const [id, setId] = useState(""); // State untuk ID Perangkat
+  const [id, setId] = useState("84:f3:eb:20:90:94"); // State untuk ID Perangkat
   const [pin, setPin] = useState(""); // State untuk Kunci Keamanan
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,13 +23,11 @@ const AddDevice = ({ navigation }) => {
   };
 
   const handleSaveDevice = () => {
-    const newDevice = { id_device: '12321321321', pin_device: 123123213 };
-    dispatch(addDevice(newDevice));
-    // setErrorMessage("");
-    // const data = JsonToString({ command: "authentication", id_perangkat: id, pin_perangkat: pin, id_mobile: idMobile });
-    // if (clientMQTT.isConnected()) {
-    //   clientMQTT.publish("request-mobile", data);
-    // }
+    setErrorMessage("");
+    const data = JsonToString({ command: "authentication", id_perangkat: id, pin_perangkat: pin, id_mobile: idMobile });
+    if (clientMQTT.isConnected()) {
+      clientMQTT.publish("request-mobile", data);
+    }
   };
 
   if (clientMQTT.isConnected()) {
@@ -61,16 +59,14 @@ const AddDevice = ({ navigation }) => {
         <Text style={{ fontWeight: "bold", paddingBottom: 10 }} variant="headlineLarge">
           Tambah Perangkat
         </Text>
-        <TextDefault>
-          Tambah serta kelola perangkatmu dengan memasukkan ID Perangkat dan Kunci Keamanan
-          Perangkat
-        </TextDefault>
+        <TextDefault>Tambah serta kelola perangkatmu dengan memasukkan ID Perangkat dan Kunci Keamanan Perangkat</TextDefault>
       </View>
 
       <View style={{ flex: 4 }}>
         <View>
           <TextDefault style={{ fontWeight: "bold", top: 5 }}>ID Perangkat</TextDefault>
           <TextInput
+            value={id}
             onChangeText={(e) => setId(e)}
             theme={{ roundness: 20 }}
             label="Masukan ID Perangkat"
